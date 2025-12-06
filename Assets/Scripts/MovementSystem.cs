@@ -12,6 +12,12 @@ public class BirdLaneMovement : MonoBehaviour
     public float laneDistanceX = 2.5f;
     public float switchSpeedX = 10f;
 
+    [Header("Swipe Settings")]
+    public float minSwipeDistance = 50f;  // pixel
+
+    private Vector2 touchStartPos;
+    private Vector2 touchEndPos;
+
     private int currentLaneY;
     private int currentLaneX;
 
@@ -29,22 +35,43 @@ public class BirdLaneMovement : MonoBehaviour
 
     void Update()
     {
-        HandleInput();
+        HandleSwipe();
 
         Vector3 local = transform.localPosition;
-
         local.y = Mathf.Lerp(local.y, targetLocalY, Time.deltaTime * switchSpeedY);
         local.x = Mathf.Lerp(local.x, targetLocalX, Time.deltaTime * switchSpeedX);
-
         transform.localPosition = local;
     }
 
-    void HandleInput()
+    void HandleSwipe()
     {
-        if (Input.GetKeyDown(KeyCode.UpArrow)) MoveUp();
-        if (Input.GetKeyDown(KeyCode.DownArrow)) MoveDown();
-        if (Input.GetKeyDown(KeyCode.LeftArrow)) MoveLeft();
-        if (Input.GetKeyDown(KeyCode.RightArrow)) MoveRight();
+        if (Input.touchCount == 0) return;
+
+        Touch touch = Input.GetTouch(0);
+
+        if (touch.phase == TouchPhase.Began)
+        {
+            touchStartPos = touch.position;
+        }
+        else if (touch.phase == TouchPhase.Ended)
+        {
+            touchEndPos = touch.position;
+
+            Vector2 swipe = touchEndPos - touchStartPos;
+            if (swipe.magnitude < minSwipeDistance) return;
+
+            // Horizontal or vertical?
+            if (Mathf.Abs(swipe.x) > Mathf.Abs(swipe.y))
+            {
+                if (swipe.x > 0) MoveRight();
+                else MoveLeft();
+            }
+            else
+            {
+                if (swipe.y > 0) MoveUp();
+                else MoveDown();
+            }
+        }
     }
 
     void MoveUp()

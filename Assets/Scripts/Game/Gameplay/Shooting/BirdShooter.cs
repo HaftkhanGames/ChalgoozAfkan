@@ -9,7 +9,7 @@ public class BirdShooter : MonoBehaviour
 
     private float nextShootTime;
     public Animator birdAnimator;
-
+    public FaceExpressionSystem faceExpressionSystem;
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space))
@@ -25,7 +25,7 @@ public class BirdShooter : MonoBehaviour
         if (Time.time < nextShootTime) return;
 
         nextShootTime = Time.time + cooldown;
-
+        faceExpressionSystem.ShowExpression(FaceExpressionSystem.ExpressionType.Attack,0.4f);
         Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
         birdAnimator.Play("Attack");
     }
