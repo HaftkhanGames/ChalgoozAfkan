@@ -131,10 +131,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyBase
   mobility: {fileID: 8844865678235011719}
   attack: {fileID: 2127715814569772443}
-  player: {fileID: 0}
   health: 100
   useCameraActivation: 1
-  activationDistance: 1
+  activationBuffer: 2
 --- !u!114 &2127715814569772443
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -152,13 +151,17 @@ MonoBehaviour:
   projectilePrefab: {fileID: 5710244001409364610, guid: 5987e4706c5fe524e8743d0581c336ec, type: 3}
   shootPoint: {fileID: 1055584669480278700}
   projectileSpeed: 15
-  spawnHeight: 1
-  cooldown: 2
+  spawnHeightOffset: 1
   shootDelay: 0.5
-  requiredWalkDistance: 2
   animator: {fileID: 4884679669655306664}
   attackStateName: Attack
-  rotateWhenPlayerPasses: 1
+  useAnimation: 1
+  singleShotMode: 0
+  attackRange: 10
+  autoEnableByRange: 1
+  disableWhenOutOfRange: 0
+  spriteTransform: {fileID: 1055584669480278700}
+  facePlayer: 1
 --- !u!114 &8844865678235011719
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -171,11 +174,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae74ab718d6d96148b23546598c4fc5d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DirectionalMobility
-  moveSpeed: 10
-  direction: 3
-  moveDistance: -2
-  moveSpeed: 2
-  loopMovement: 0
-  flipSprite: 1
+  moveSpeed: 5
+  direction: 2
+  flipSprite: 0
+  stopRange: 10
+  stopOnlyOnce: 1
   spriteTransform: {fileID: 1055584669480278700}
   animator: {fileID: 4884679669655306664}
+  movingBool: Moving
+  attackBool: Attack

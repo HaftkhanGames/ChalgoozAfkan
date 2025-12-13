@@ -1,43 +1,35 @@
 using UnityEngine;
 
-public class RockProjectile : MonoBehaviour
+public class RockProjectile : ProjectileBase
 {
-    private Vector3 moveDirection;
-    private float moveSpeed;
-    private bool isActive = false;
+    private Vector2 direction;
+    private float speed;
+    private bool isActive;
 
-    void Update()
+    protected override void OnEnable()
     {
-        if (!isActive) return;
-        
-        // حرکت خطی
-        transform.position += moveDirection * moveSpeed * Time.deltaTime;
+        base.OnEnable();
+        isActive = false;
     }
 
-    public void Setup(Vector3 direction, float speed)
+    private void Update()
     {
-        moveDirection = direction.normalized;
-        moveSpeed = speed;
+        if (!isActive || hasHit) return;
+
+        transform.position += (Vector3)(direction * speed * Time.deltaTime);
+    }
+
+    public void Setup(Vector2 dir, float moveSpeed)
+    {
+        direction = dir.normalized;
+        speed = moveSpeed;
         isActive = true;
-        Debug.Log($"Projectile Setup: Direction={direction}, Speed={speed}");
-    
-        Destroy(gameObject, 5f);
     }
 
-
-    void OnTriggerEnter(Collider other)
+    // ✅ هیچ افکتی اینجا نداریم
+    protected override void OnHit()
     {
-        Debug.Log($"Projectile hit: {other.name}");
-        
-        if (other.CompareTag("Player"))
-        {
-            PlayerHealth health = other.GetComponent<PlayerHealth>();
-            if (health != null)
-            {
-                health.TakeDamage(10);
-            }
-        }
-        
-        Destroy(gameObject);
+        Debug.Log("RockProjectile.OnHit 🔥");
+        base.OnHit();
     }
 }

@@ -1,131 +1,179 @@
 using UnityEngine;
 
+/// <summary>
+/// Continuous directional movement.
+/// Enemy moves infinitely in one direction
+/// Stops ONLY when player enters attack range.
+/// </summary>
 public class DirectionalMobility : EnemyMobility
 {
     public enum MoveDirection { Up, Down, Left, Right }
 
-    [Header("Movement")]
-    public MoveDirection direction = MoveDirection.Right;
-    public float moveDistance = 3f;
-    public float moveSpeed = 2f;
-    public bool loopMovement = true;
-    
-    [Header("Visual")]
-    public bool flipSprite = true;
-    public Transform spriteTransform;
-    
-    [Header("Animation")]
-    public Animator animator;
+    #region Inspector Fields
 
-    private Vector3 startPoint, endPoint;
-    private bool movingForward = true;
-    private bool facingRight = true;
+    [Header("🚶 Movement")]
+    public MoveDirection direction = MoveDirection.Right;
+    public bool flipSprite = true;
+
+    [Header("📏 Stop Conditions")]
+    [Tooltip("Stop moving when player is inside this range")]
+    public float stopRange = 6f;
+
+    [Header("⚔️ One-Shot Enemies")]
+    [Tooltip("If true, enemy will stop only once to attack")]
+    public bool stopOnlyOnce = false;
+
+    private bool stopConsumed;
+
+    [Header("🧍 Visual")]
+    public Transform spriteTransform;
+
+    [Header("🎬 Animator")] 
+    public Animator animator;
+    public string movingBool = "Moving";
+    public string attackBool = "Attack";
+
+    #endregion
+
+    #region Private Fields
+
+    private Vector3 moveDir;
+    private bool facingRight;
+    private bool isHorizontal;
+    private bool isStoppedByPlayer;
+
     private Vector3 lastPosition;
 
-    void Start()
-    {
-        Initialize();
-    }
+    #endregion
 
-    void OnEnable()
+    #region Initialization
+
+    public override void Initialize(EnemyBase baseEnemy)
     {
-        if (animator != null)
+        base.Initialize(baseEnemy);
+
+        animator?.SetBool(movingBool, true);
+        animator?.SetBool(attackBool, false);
+        if (spriteTransform == null)
+            spriteTransform = transform;
+
+        moveDir = GetDirectionVector(direction).normalized;
+        isHorizontal = direction == MoveDirection.Left || direction == MoveDirection.Right;
+
+        if (isHorizontal)
         {
-            animator.SetBool("Start", true);
-            animator.SetBool("Moving", true);
+            facingRight = direction == MoveDirection.Right;
+            UpdateFacing();
         }
+
         lastPosition = transform.position;
+        animator?.SetBool(movingBool, true);
     }
 
-    void Initialize()
+    private void OnEnable()
     {
-        if (spriteTransform == null) spriteTransform = transform;
-        
-        startPoint = new Vector3(transform.position.x, transform.position.y, transform.position.z);
-        endPoint = startPoint + GetDirectionVector() * moveDistance;
-
-        // فیکس: اول بررسی میکنیم که اصلاً حرکت افقی هست یا نه
-        if (direction == MoveDirection.Right)
-            facingRight = true;  // به راست حرکت = صورت راست
-        else if (direction == MoveDirection.Left)
-            facingRight = false; // به چپ حرکت = صورت چپ
-        
-        UpdateFacing();
-        
         lastPosition = transform.position;
-        
-        if (animator != null)
-        {
-            animator.SetBool("Start", true);
-            animator.SetBool("Moving", true);
-        }
+        animator?.SetBool(movingBool, true);
+        animator?.SetBool(attackBool, false); // ✅
     }
+
+    #endregion
+
+    #region Movement Logic
 
     public override void HandleMovement()
     {
         if (enemy == null) return;
 
-        Vector3 target = movingForward ? endPoint : startPoint;
-        Vector3 nextPos = Vector3.MoveTowards(enemy.transform.position, target, moveSpeed * Time.deltaTime);
-        nextPos.y = startPoint.y;
-        
-        enemy.transform.position = nextPos;
+        HandleStopByRange();
 
-        // Update animation
-        bool isMoving = Vector3.Distance(lastPosition, nextPos) > 0.001f;
-        animator?.SetBool("Moving", isMoving);
-        lastPosition = nextPos;
+        if (isStoppedByPlayer)
+            return;
 
-        // Check arrival
-        if (Vector3.Distance(nextPos, target) <= 0.05f && loopMovement)
+        Vector3 nextPos = transform.position +
+                          moveDir * moveSpeed * Time.deltaTime;
+
+        transform.position = nextPos;
+    }
+
+
+    private void HandleStopByRange()
+    {
+        if (!HasValidPlayer()) return;
+
+        // ⛔ بعد از اولین شلیک، دیگر توقف مجاز نیست
+        if (stopOnlyOnce && stopConsumed)
+            return;
+
+        float dist = Vector2.Distance(transform.position, player.position);
+        bool shouldStop = dist <= stopRange;
+
+        if (shouldStop != isStoppedByPlayer)
         {
-            movingForward = !movingForward;
+            isStoppedByPlayer = shouldStop;
 
-            // فقط اگه حرکت افقی بود فلیپ کن
-            if (flipSprite && (direction == MoveDirection.Left || direction == MoveDirection.Right))
+            if (isStoppedByPlayer)
             {
-                facingRight = !facingRight;
-                UpdateFacing();
-            }
+                animator?.SetBool(movingBool, false);
+                animator?.SetBool(attackBool, true);
 
-            animator?.SetTrigger("Turn");
+                // ✅ این توقف مصرف شد
+                if (stopOnlyOnce)
+                    stopConsumed = true;
+            }
+            else
+            {
+                animator?.SetBool(attackBool, false);
+                animator?.SetBool(movingBool, true);
+            }
         }
     }
 
-    void UpdateFacing()
+
+
+
+    private void UpdateAnimation(Vector3 currentPosition)
     {
-        if (spriteTransform == null) return;
-        
+        if (animator == null) return;
+
+        bool moving = (currentPosition - lastPosition).sqrMagnitude > 0.0001f;
+        animator.SetBool(movingBool, moving);
+        lastPosition = currentPosition;
+    }
+
+    #endregion
+
+    #region Helpers
+
+    private void UpdateFacing()
+    {
+        if (!isHorizontal || spriteTransform == null) return;
+
         Vector3 scale = spriteTransform.localScale;
-        // facingRight = true → scale.x مثبت (صورت به راست)
-        // facingRight = false → scale.x منفی (صورت به چپ)
         scale.x = facingRight ? Mathf.Abs(scale.x) : -Mathf.Abs(scale.x);
         spriteTransform.localScale = scale;
     }
 
-    Vector3 GetDirectionVector()
+    private Vector3 GetDirectionVector(MoveDirection dir)
     {
-        return direction switch
+        return dir switch
         {
-            MoveDirection.Up => Vector3.forward,
-            MoveDirection.Down => Vector3.back,
-            MoveDirection.Left => Vector3.left,
-            _ => Vector3.right
+            MoveDirection.Up    => Vector3.up,
+            MoveDirection.Down  => Vector3.down,
+            MoveDirection.Left  => Vector3.left,
+            _                   => Vector3.right
         };
     }
 
-    void OnDrawGizmosSelected()
-    {
-        Vector3 start = Application.isPlaying ? startPoint : transform.position;
-        Vector3 end = start + GetDirectionVector() * moveDistance;
+    #endregion
 
-        Gizmos.color = Color.cyan;
-        Gizmos.DrawLine(start, end);
-        
-        Gizmos.color = Color.green;
-        Gizmos.DrawWireSphere(start, 0.15f);
-        
+    #region Gizmos
+
+    private void OnDrawGizmosSelected()
+    {
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(end, 0.15f);
+        Gizmos.DrawWireSphere(transform.position, stopRange);
     }
+
+    #endregion
 }
