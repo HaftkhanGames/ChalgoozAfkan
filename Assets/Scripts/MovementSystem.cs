@@ -2,123 +2,189 @@ using UnityEngine;
 
 public class BirdLaneMovement : MonoBehaviour
 {
-    [Header("Vertical Lanes (Y Axis)")]
-    public int totalLanesY = 3;
-    public float laneDistanceY = 2.5f;
-    public float switchSpeedY = 10f;
-
-    [Header("Horizontal Lanes (X Axis)")]
+    [Header("Grid Settings")]
+    [Tooltip("تعداد لاین‌های افقی")]
     public int totalLanesX = 3;
+    [Tooltip("تعداد لاین‌های عمودی")]
+    public int totalLanesY = 3;
+    
+    [Tooltip("فاصله بین هر لاین در محور ایکس")]
     public float laneDistanceX = 2.5f;
-    public float switchSpeedX = 10f;
+    [Tooltip("فاصله بین هر لاین در محور وای")]
+    public float laneDistanceY = 2.5f;
 
-    [Header("Swipe Settings")]
-    public float minSwipeDistance = 50f;  // pixel
+    [Header("Movement Smoothness")]
+    [Tooltip("سرعت جابجایی بین لاین‌ها")]
+    public float moveSpeed = 15f;
+    [Tooltip("مقدار کج شدن پرنده هنگام حرکت به چپ و راست")]
+    public float tiltAmount = 20f;
+    [Tooltip("سرعت کج شدن و برگشتن به حالت عادی")]
+    public float tiltSpeed = 10f;
 
-    private Vector2 touchStartPos;
-    private Vector2 touchEndPos;
+    [Header("Input Settings")]
+    public float minSwipeDistance = 30f; // کمتر شد تا حساس‌تر باشد
+    public bool useMouseForTesting = true; // برای تست راحت در ادیتور
 
-    private int currentLaneY;
+    // وضعیت فعلی
     private int currentLaneX;
-
-    private float targetLocalY;
-    private float targetLocalX;
+    private int currentLaneY;
+    private Vector3 targetLocalPosition;
+    
+    // متغیرهای ورودی
+    private Vector2 touchStartPos;
+    private bool isSwiping = false;
 
     void Start()
     {
-        currentLaneY = totalLanesY / 2;
+        // محاسبه لاین وسط به عنوان نقطه شروع
         currentLaneX = totalLanesX / 2;
+        currentLaneY = totalLanesY / 2;
 
-        targetLocalY = GetLaneY(currentLaneY);
-        targetLocalX = GetLaneX(currentLaneX);
+        UpdateTargetPosition();
+        
+        // ست کردن پوزیشن اولیه بدون انیمیشن
+        transform.localPosition = targetLocalPosition;
     }
 
     void Update()
     {
-        HandleSwipe();
-
-        Vector3 local = transform.localPosition;
-        local.y = Mathf.Lerp(local.y, targetLocalY, Time.deltaTime * switchSpeedY);
-        local.x = Mathf.Lerp(local.x, targetLocalX, Time.deltaTime * switchSpeedX);
-        transform.localPosition = local;
+        HandleInput();
+        MoveBird();
+        HandleTilt();
     }
 
-    void HandleSwipe()
+    /// <summary>
+    /// مدیریت ورودی‌ها (تاچ و موس) با واکنش سریع
+    /// </summary>
+    void HandleInput()
     {
-        if (Input.touchCount == 0) return;
-
-        Touch touch = Input.GetTouch(0);
-
-        if (touch.phase == TouchPhase.Began)
+        // 1. تشخیص شروع تاچ یا کلیک
+        if (Input.GetMouseButtonDown(0))
         {
-            touchStartPos = touch.position;
+            touchStartPos = Input.mousePosition;
+            isSwiping = true;
         }
-        else if (touch.phase == TouchPhase.Ended)
+
+        // 2. تشخیص ادامه حرکت (تاچ یا موس)
+        if (Input.GetMouseButton(0) && isSwiping)
         {
-            touchEndPos = touch.position;
+            Vector2 currentSwipe = (Vector2)Input.mousePosition - touchStartPos;
 
-            Vector2 swipe = touchEndPos - touchStartPos;
-            if (swipe.magnitude < minSwipeDistance) return;
-
-            // Horizontal or vertical?
-            if (Mathf.Abs(swipe.x) > Mathf.Abs(swipe.y))
+            // اگر طول حرکت از حداقل بیشتر شد، فرمان را اجرا کن
+            if (currentSwipe.magnitude >= minSwipeDistance)
             {
-                if (swipe.x > 0) MoveRight();
-                else MoveLeft();
-            }
-            else
-            {
-                if (swipe.y > 0) MoveUp();
-                else MoveDown();
+                ProcessSwipe(currentSwipe);
+                isSwiping = false; // جلوگیری از تشخیص مجدد در یک بار کشیدن
             }
         }
-    }
 
-    void MoveUp()
-    {
-        if (currentLaneY < totalLanesY - 1)
+        // 3. پایان تاچ (ریست کردن برای اطمینان)
+        if (Input.GetMouseButtonUp(0))
         {
-            currentLaneY++;
-            targetLocalY = GetLaneY(currentLaneY);
+            isSwiping = false;
         }
     }
 
-    void MoveDown()
+    /// <summary>
+    /// پردازش جهت سوایپ و اعمال حرکت
+    /// </summary>
+    void ProcessSwipe(Vector2 swipeVector)
     {
-        if (currentLaneY > 0)
+        // تشخیص افقی یا عمودی بودن حرکت
+        if (Mathf.Abs(swipeVector.x) > Mathf.Abs(swipeVector.y))
         {
-            currentLaneY--;
-            targetLocalY = GetLaneY(currentLaneY);
+            // حرکت افقی
+            if (swipeVector.x > 0) ChangeLaneX(1);  // Right
+            else ChangeLaneX(-1); // Left
+        }
+        else
+        {
+            // حرکت عمودی
+            if (swipeVector.y > 0) ChangeLaneY(1);  // Up
+            else ChangeLaneY(-1); // Down
         }
     }
 
-    void MoveLeft()
+    /// <summary>
+    /// تغییر لاین افقی
+    /// </summary>
+    void ChangeLaneX(int direction)
     {
-        if (currentLaneX > 0)
+        int targetLane = currentLaneX + direction;
+        
+        // بررسی محدودیت‌ها (Clamp)
+        if (targetLane >= 0 && targetLane < totalLanesX)
         {
-            currentLaneX--;
-            targetLocalX = GetLaneX(currentLaneX);
+            currentLaneX = targetLane;
+            UpdateTargetPosition();
         }
     }
 
-    void MoveRight()
+    /// <summary>
+    /// تغییر لاین عمودی
+    /// </summary>
+    void ChangeLaneY(int direction)
     {
-        if (currentLaneX < totalLanesX - 1)
+        int targetLane = currentLaneY + direction;
+
+        // بررسی محدودیت‌ها (Clamp)
+        if (targetLane >= 0 && targetLane < totalLanesY)
         {
-            currentLaneX++;
-            targetLocalX = GetLaneX(currentLaneX);
+            currentLaneY = targetLane;
+            UpdateTargetPosition();
         }
     }
 
-    float GetLaneY(int lane)
+    /// <summary>
+    /// محاسبه پوزیشن مقصد بر اساس شماره لاین‌ها
+    /// </summary>
+    void UpdateTargetPosition()
     {
-        int mid = totalLanesY / 2;
-        return (lane - mid) * laneDistanceY;
+        // فرمول: (شماره لاین - وسط) * فاصله
+        // مثال: اگر 3 لاین باشد، وسط می‌شود 1. لاین 0 می‌شود -1 * فاصله.
+        float targetX = (currentLaneX - (totalLanesX / 2)) * laneDistanceX;
+        float targetY = (currentLaneY - (totalLanesY / 2)) * laneDistanceY;
+
+        // حفظ مقدار Z فعلی (چون پرنده در طول حرکت می‌کند)
+        targetLocalPosition = new Vector3(targetX, targetY, transform.localPosition.z);
     }
 
-    float GetLaneX(int lane)
+    /// <summary>
+    /// حرکت نرم به سمت پوزیشن مقصد
+    /// </summary>
+    void MoveBird()
     {
-        int mid = totalLanesX / 2;
-        return (lane - mid) * laneDistanceX;
+        // استفاده از Vector3.Lerp برای نرمی حرکت
+        // برای حرکت در راستای Z (جلو رفتن)، معمولاً پرنت حرکت می‌کند و این اسکریپت فقط X و Y لوکال را تغییر می‌دهد
+        // اما برای اطمینان Z را جدا می‌کنیم یا کل لوکال را ست می‌کنیم.
+        
+        Vector3 newPos = Vector3.Lerp(transform.localPosition, targetLocalPosition, Time.deltaTime * moveSpeed);
+        
+        // نکته مهم: اگر بازی رانر است و این آبجکت حرکت رو به جلو دارد، نباید Z لوکال را دستکاری کنیم مگر اینکه ثابت باشد.
+        // اینجا فرض بر این است که Z لوکال ثابت است و حرکت رو به جلو توسط Parent انجام می‌شود.
+        transform.localPosition = newPos; 
+    }
+
+    /// <summary>
+    /// جلوه بصری چرخش (Tilt) هنگام حرکت به چپ و راست
+    /// </summary>
+    void HandleTilt()
+    {
+        float targetRotZ = 0;
+        
+        // اگر پوزیشن فعلی با مقصد فاصله زیادی در محور X دارد، یعنی در حال حرکت هستیم
+        float diffX = targetLocalPosition.x - transform.localPosition.x;
+
+        // اگر اختلاف مثبت باشد (حرکت به راست) -> چرخش منفی (ساعتگرد) و برعکس
+        // آستانه 0.1 برای جلوگیری از لرزش
+        if (Mathf.Abs(diffX) > 0.1f)
+        {
+            // محاسبه میزان چرخش بر اساس جهت حرکت (-1 برای راست، 1 برای چپ تا حس طبیعی بدهد)
+            targetRotZ = Mathf.Sign(diffX) * -tiltAmount; 
+        }
+
+        // اعمال چرخش نرم
+        Quaternion targetRotation = Quaternion.Euler(0, 0, targetRotZ);
+        transform.localRotation = Quaternion.Lerp(transform.localRotation, targetRotation, Time.deltaTime * tiltSpeed);
     }
 }
