@@ -30,7 +30,7 @@ public class MeleeAttack : EnemyAttack
     [Tooltip("آیا این حمله فقط یک بار انجام می‌شود؟ (مناسب برای تله‌ها و موانع)")]
     public bool attackOnce = false;
     private bool hasAttacked = false;
-
+    
     // متغیرهای کش شده
     private PlayerHealth cachedPlayerHealth;
     private Quaternion initialRotation;
