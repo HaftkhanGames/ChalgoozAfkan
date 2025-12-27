@@ -7,13 +7,12 @@ public class MainMenuManager : MonoBehaviour
     public static MainMenuManager Instance;
 
     [Header("Panels Reference")]
-    public List<MenuPanel> allPanels; // تمام پنل‌ها رو بکش اینجا
+    public List<MenuPanel> allPanels;
 
     [Header("Settings")]
     public MenuPanelType startingPanel = MenuPanelType.MainMenu;
 
     private MenuPanel currentPanel;
-    // استک برای دکمه بازگشت (Back) - اختیاری ولی برای تجربه کاربری عالیه
     private Stack<MenuPanelType> panelHistory = new Stack<MenuPanelType>();
 
     private void Awake()
@@ -23,36 +22,39 @@ public class MainMenuManager : MonoBehaviour
 
     private void Start()
     {
-        // بستن همه پنل‌ها
+        // بستن همه پنل‌ها به صورت فوری در شروع
         foreach (var panel in allPanels)
         {
-            panel.Close();
+            panel.CloseImmediate();
         }
         
         // باز کردن پنل شروع
         OpenPanel(startingPanel);
     }
 
-    // --- Core Navigation ---
-
     public void OpenPanel(MenuPanelType type)
     {
-        // PopupManager.Instance.ShowSuccess("موفقیت انجام شد!", 5f);
-        // PopupManager.Instance.ShowError("سکه کافی نیست!", 3f);
-
-        // اگر پنلی باز بود، ببندش (یا اگه میخوای روی هم باز بشن این خط رو بردار)
-        if (currentPanel != null && currentPanel.panelType != MenuPanelType.MainMenu) 
-        {
-            currentPanel.Close();
-        }
+        // اگر کاربر روی دکمه پنلی زد که همین الان بازه (به عنوان پنل فعال)، کاری نکن
+        if (currentPanel != null && currentPanel.panelType == type) return;
 
         MenuPanel targetPanel = allPanels.Find(p => p.panelType == type);
         
         if (targetPanel != null)
         {
-            // اگر پنل اصلی نیست، پنل قبلی رو به تاریخچه اضافه کن (برای دکمه بک)
             if (currentPanel != null)
             {
+                // --- شرط جدید: چه زمانی پنل قبلی بسته نشود؟ ---
+                // اگر در منوی اصلی هستیم AND پنل جدید یکی از پنل‌های "روی هم" (Overlay) است
+                // (به جای MenuPanelType.Tasks نام دقیق Enum خود را بنویسید)
+                bool keepMainMenuOpen = (currentPanel.panelType == MenuPanelType.MainMenu) && 
+                                        (type == MenuPanelType.Tasks /* || type == MenuPanelType.Settings */);
+
+                if (!keepMainMenuOpen)
+                {
+                    currentPanel.Close();
+                }
+
+                // همیشه پنل قبلی را به تاریخچه اضافه کن تا دکمه Back کار کند
                 panelHistory.Push(currentPanel.panelType);
             }
 
@@ -61,40 +63,52 @@ public class MainMenuManager : MonoBehaviour
         }
         else
         {
-            Debug.LogError($"Panel of type {type} not found in the list!");
+            Debug.LogError($"Panel of type {type} not found!");
         }
     }
 
-    // دکمه بازگشت (مخصوصاً برای موبایل)
     public void GoBack()
     {
         if (panelHistory.Count > 0)
         {
             MenuPanelType previousType = panelHistory.Pop();
             
-            // پنل فعلی رو ببند
+            // پنل فعلی (مثلاً تسک‌ها) را ببند
             if(currentPanel != null) currentPanel.Close();
             
-            // پنل قبلی رو پیدا کن و باز کن (بدون اضافه کردن دوباره به استک)
+            // پنل قبلی (مثلاً منوی اصلی) را پیدا کن
             MenuPanel prevPanel = allPanels.Find(p => p.panelType == previousType);
+            
             if(prevPanel != null)
             {
-                prevPanel.Open();
+                // چک کن اگر پنل قبلی (منو) هنوز بازه (چون بسته نشده بود)، دیگه انیمیشن Open رو اجرا نکن
+                if (!prevPanel.gameObject.activeInHierarchy)
+                {
+                    prevPanel.Open();
+                }
+                
+                // پنل فعال رو برگردون به قبلی
                 currentPanel = prevPanel;
             }
         }
         else
         {
-            // اگر هیچی تو استک نبود و تو منوی اصلی بودیم، خروج از بازی؟
-            Debug.Log("No history left.");
+            // اگر هیچی تو استک نبود و پنل فعلی منوی اصلی نبود، برگرد به منوی اصلی
+            if (currentPanel != null && currentPanel.panelType != MenuPanelType.MainMenu)
+            {
+                OpenPanel(MenuPanelType.MainMenu);
+            }
+            else
+            {
+                // خروج از بازی در اندروید (اختیاری)
+                // Application.Quit();
+                Debug.Log("Already at Main Menu root.");
+            }
         }
     }
 
-    // تابع کمکی برای وصل کردن دکمه‌های ساده UI در اینسپکتور
-    // این تابع رو به OnClick دکمه‌ها وصل کن و نوع پنل رو انتخاب کن
     public void OnNavigateButton(string panelTypeName)
     {
-        // تبدیل string به Enum (برای اینکه بتونی تو اینسپکتور راحت باشی)
         if (System.Enum.TryParse(panelTypeName, out MenuPanelType type))
         {
             OpenPanel(type);
@@ -102,48 +116,35 @@ public class MainMenuManager : MonoBehaviour
     }
 
     // --- Action Handling ---
-
     public void OnStartGameClicked()
     {
-        // منطق چک کردن قلب قبل از شروع
         if (GamePersistenceManager.Instance.TryConsumeHeart())
         {
-            // صدا زدن لودینگ اسکرین یا مستقیم رفتن
             SceneManager.LoadScene("Game");
         }
         else
         {
-            // باز کردن پنل خرید قلب
             OpenPanel(MenuPanelType.NotEnoughHeart);
         }
     }
     
     public void OnBuyHeartClicked()
     {
-        // مثلا اتصال به تبلیغات یا کم کردن سکه
         if(GamePersistenceManager.Instance.SpendCoins(500))
         {
-            GamePersistenceManager.Instance.data.currentHearts = 5;
-            GamePersistenceManager.Instance.SaveGame();
-            
-            // رفرش UI و بستن پاپ آپ
+            // GamePersistenceManager.Instance.RestoreHearts(); // متد فرضی
             GoBack();
         }
     }
 
-    // هندل کردن دکمه Back سخت‌افزاری اندروید
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
+            // اگر در منوی اصلی نیستیم، دکمه Back کار کنه
             if (currentPanel != null && currentPanel.panelType != MenuPanelType.MainMenu)
             {
                 GoBack();
-            }
-            else
-            {
-                // خروج از بازی؟
-                // Application.Quit();
             }
         }
     }

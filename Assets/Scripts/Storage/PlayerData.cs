@@ -21,7 +21,7 @@ public class PlayerData
     // --- Decorations ---
     // کلید: شناسه دکوراسیون (مثلاً "LivingRoom_Sofa")
     // مقدار: اطلاعات ذخیره شده آن دکور
-    public Dictionary<string, DecorationSaveData> decorations;
+    public Dictionary<string, DecorationSaveData> decorations = new Dictionary<string, DecorationSaveData>();
 
     // --- Constructor ---
     public PlayerData()

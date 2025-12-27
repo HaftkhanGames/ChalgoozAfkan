@@ -1,5 +1,6 @@
 using UnityEngine;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
@@ -32,7 +33,8 @@ public class GamePersistenceManager : MonoBehaviour
     {
         savePath = Application.persistentDataPath + "/playerdata.dat";
         LoadGame();
-        
+        GamePersistenceManager.Instance.AddCurrency(0, 0, 100, "Debug", "TestAdd");
+
         // بلافاصله بعد از لود، قلب‌ها را چک کن
         CalculateOfflineHearts();
     }
@@ -157,24 +159,37 @@ public class GamePersistenceManager : MonoBehaviour
 
     public void SetDecoration(string decorationID, int modelIndex)
     {
+        // 1. اطمینان از لود بودن کل دیتا
+        if (data == null)
+        {
+            data = new PlayerData(); // اگر دیتا کلاً نبود، بساز
+        }
+
+        // 2. فیکس ارور شما: اطمینان از ساخته شدن دیکشنری
+        if (data.decorations == null)
+        {
+            data.decorations = new Dictionary<string, DecorationSaveData>();
+        }
+
+        // حالا این خط دیگر ارور نمی‌دهد
         bool isNew = !data.decorations.ContainsKey(decorationID);
 
-        if (!isNew)
+        // ساخت آبجکت جدید با استفاده از Constructor که تعریف کردید
+        DecorationSaveData decoData = new DecorationSaveData(true, modelIndex);
+
+        if (isNew)
         {
-            data.decorations[decorationID].selectedModelIndex = modelIndex;
-            data.decorations[decorationID].isBuilt = true;
+            data.decorations.Add(decorationID, decoData);
         }
         else
         {
-            data.decorations.Add(decorationID, new DecorationSaveData(true, modelIndex));
+            data.decorations[decorationID] = decoData;
         }
-        SaveGame();
 
-        // [Analytics] ثبت یک رویداد طراحی (Design Event)
-        // فرمت: Decoration:Built:Tree_01:Model_2
-        string eventName = $"Decoration:{(isNew ? "Built" : "Changed")}:{decorationID}";
-        AnalyticsManager.Instance.LogDesignEvent(eventName, modelIndex);
+        SaveGame();
+        Debug.Log($"Decoration Saved: {decorationID} -> Model {modelIndex}");
     }
+
 
     // --- Currency Helpers (Modified for Analytics) ---
     

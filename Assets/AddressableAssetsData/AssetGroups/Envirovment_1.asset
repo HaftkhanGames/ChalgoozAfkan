@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Envirovment_1
+  m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
+  m_GroupName: Envirovment_1
+  m_GUID: 669760f9339b52e4baa9f2f8d0845c8a
+  m_SerializeEntries:
+  - m_GUID: 00cd764e028ed3e4792851eeebf0df54
+    m_Address: Assets/Prefabs/Decoration/Envirovment_1/Cage/1.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 43c95797acefaea4684a6f9c0768d2b1
+    m_Address: Assets/Prefabs/Decoration/Envirovment_1/Cage/3.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7e613b4be4e5bc944b25dc8b4cdc75c4
+    m_Address: Assets/Prefabs/Decoration/Envirovment_1/Cage/4.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 822b36007a973f14498185d60bf82fc4
+    m_Address: Assets/Prefabs/Decoration/Envirovment_1/Cage/2.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cb102f732e1a73a4bb234c83975f1f31
+    m_Address: Assets/Prefabs/Decoration/Envirovment_1/Envirovment_1.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 427a2774e76f2334aa708c3efa4d6246, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 6c4be3a8dda20504492aa4338f32c9de, type: 2}
+    - {fileID: 11400000, guid: a66043a151d5a214091a3b7d40bee22c, type: 2}
