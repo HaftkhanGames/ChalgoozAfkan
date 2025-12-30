@@ -96,31 +96,27 @@ public class DecorationSpotController : MonoBehaviour
         if (col) col.enabled = canInteract;
     }
 
+    // در DecorationSpotController.cs
+
     private void ActivateModel(int index, bool animate)
     {
         if (index < 0 || index >= modelObjects.Count) return;
 
-        // خاموش کردن مدل‌های دیگر
+        // خاموش کردن همه
         for (int i = 0; i < modelObjects.Count; i++)
         {
-            if (i != index && modelObjects[i].activeSelf)
-            {
-                modelObjects[i].SetActive(false);
-            }
+            if (i != index) modelObjects[i].SetActive(false);
         }
 
-        // روشن کردن مدل انتخاب شده
         GameObject targetModel = modelObjects[index];
         
-        // اگر مدل از قبل روشن بود و انیمیشن نمی‌خواهیم، برگردیم
-        if (targetModel.activeSelf && !animate) return;
-
+        // نکته مهم: قبل از انیمیشن حتما SetActive(true) شود
         targetModel.SetActive(true);
         currentActiveIndex = index;
 
         if (animate)
         {
-            // ریست کردن اسکیل برای انیمیشن
+            // از اسکیل 0 شروع میکنیم به 1
             targetModel.transform.localScale = Vector3.zero;
             targetModel.transform.DOScale(Vector3.one, 0.5f).SetEase(Ease.OutBack);
         }
@@ -129,4 +125,5 @@ public class DecorationSpotController : MonoBehaviour
             targetModel.transform.localScale = Vector3.one;
         }
     }
+
 }

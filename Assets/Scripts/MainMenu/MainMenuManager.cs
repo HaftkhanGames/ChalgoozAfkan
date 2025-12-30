@@ -1,6 +1,18 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections.Generic;
+using DG.Tweening; // حتما برای حرکت نرم اضافه شود
+
+// 1. تعریف کلاس تنظیمات برای جابجایی المان‌ها
+[System.Serializable]
+public class UIShifterConfig
+{
+    public string description;          // فقط برای توضیحات در اینسپکتور (مثلا: Move StartButton Left)
+    public RectTransform targetElement; // دکمه یا المانی که باید حرکت کند
+    public MenuPanelType triggerPanel;  // وقتی این پنل باز شد، حرکت انجام شود
+    public float shiftOffsetX;          // مقدار جابجایی در محور X (منفی = چپ، مثبت = راست)
+    public float animationDuration = 0.5f;
+}
 
 public class MainMenuManager : MonoBehaviour
 {
@@ -8,6 +20,13 @@ public class MainMenuManager : MonoBehaviour
 
     [Header("Panels Reference")]
     public List<MenuPanel> allPanels;
+
+    [Header("UI Shifting Settings")]
+    // 2. لیست تنظیمات که در اینسپکتور پر می‌کنید
+    public List<UIShifterConfig> uiShifters; 
+    
+    // دیکشنری برای ذخیره موقعیت اصلی المان‌ها تا بتوانیم برگردانیم
+    private Dictionary<RectTransform, Vector2> initialPositions = new Dictionary<RectTransform, Vector2>();
 
     [Header("Settings")]
     public MenuPanelType startingPanel = MenuPanelType.MainMenu;
@@ -22,6 +41,15 @@ public class MainMenuManager : MonoBehaviour
 
     private void Start()
     {
+        // 3. ذخیره موقعیت اولیه تمام دکمه‌هایی که قرار است حرکت کنند
+        foreach (var config in uiShifters)
+        {
+            if (config.targetElement != null && !initialPositions.ContainsKey(config.targetElement))
+            {
+                initialPositions.Add(config.targetElement, config.targetElement.anchoredPosition);
+            }
+        }
+
         // بستن همه پنل‌ها به صورت فوری در شروع
         foreach (var panel in allPanels)
         {
@@ -34,7 +62,7 @@ public class MainMenuManager : MonoBehaviour
 
     public void OpenPanel(MenuPanelType type)
     {
-        // اگر کاربر روی دکمه پنلی زد که همین الان بازه (به عنوان پنل فعال)، کاری نکن
+        print(type.ToString());
         if (currentPanel != null && currentPanel.panelType == type) return;
 
         MenuPanel targetPanel = allPanels.Find(p => p.panelType == type);
@@ -43,23 +71,21 @@ public class MainMenuManager : MonoBehaviour
         {
             if (currentPanel != null)
             {
-                // --- شرط جدید: چه زمانی پنل قبلی بسته نشود؟ ---
-                // اگر در منوی اصلی هستیم AND پنل جدید یکی از پنل‌های "روی هم" (Overlay) است
-                // (به جای MenuPanelType.Tasks نام دقیق Enum خود را بنویسید)
-                bool keepMainMenuOpen = (currentPanel.panelType == MenuPanelType.MainMenu) && 
-                                        (type == MenuPanelType.Tasks /* || type == MenuPanelType.Settings */);
-
+                bool keepMainMenuOpen = (currentPanel.panelType == MenuPanelType.MainMenu);
+                
                 if (!keepMainMenuOpen)
                 {
                     currentPanel.Close();
                 }
 
-                // همیشه پنل قبلی را به تاریخچه اضافه کن تا دکمه Back کار کند
                 panelHistory.Push(currentPanel.panelType);
             }
 
             targetPanel.Open();
             currentPanel = targetPanel;
+
+            // 4. فراخوانی تابع مدیریت جابجایی‌ها بر اساس پنل جدید
+            UpdateUIShifters(type);
         }
         else
         {
@@ -73,36 +99,67 @@ public class MainMenuManager : MonoBehaviour
         {
             MenuPanelType previousType = panelHistory.Pop();
             
-            // پنل فعلی (مثلاً تسک‌ها) را ببند
             if(currentPanel != null) currentPanel.Close();
             
-            // پنل قبلی (مثلاً منوی اصلی) را پیدا کن
             MenuPanel prevPanel = allPanels.Find(p => p.panelType == previousType);
             
             if(prevPanel != null)
             {
-                // چک کن اگر پنل قبلی (منو) هنوز بازه (چون بسته نشده بود)، دیگه انیمیشن Open رو اجرا نکن
                 if (!prevPanel.gameObject.activeInHierarchy)
                 {
                     prevPanel.Open();
                 }
                 
-                // پنل فعال رو برگردون به قبلی
                 currentPanel = prevPanel;
+
+                // 5. وقتی برمی‌گردیم عقب، باید وضعیت دکمه‌ها بر اساس پنل قبلی تنظیم شود
+                UpdateUIShifters(prevPanel.panelType);
             }
         }
         else
         {
-            // اگر هیچی تو استک نبود و پنل فعلی منوی اصلی نبود، برگرد به منوی اصلی
             if (currentPanel != null && currentPanel.panelType != MenuPanelType.MainMenu)
             {
                 OpenPanel(MenuPanelType.MainMenu);
             }
             else
             {
-                // خروج از بازی در اندروید (اختیاری)
-                // Application.Quit();
                 Debug.Log("Already at Main Menu root.");
+            }
+        }
+    }
+
+    // --- تابع جدید: مدیریت حرکت دکمه‌ها ---
+    private void UpdateUIShifters(MenuPanelType activePanelType)
+    {
+        // الف) ابتدا همه المان‌ها را به حالت پیش‌فرض (Reset) برمی‌گردانیم
+        // این کار باعث می‌شود اگر از پنل Tasks به Shop رفتیم، دکمه‌هایی که برای Tasks جابجا شده بودند برگردند
+        foreach (var kvp in initialPositions)
+        {
+            RectTransform target = kvp.Key;
+            Vector2 originalPos = kvp.Value;
+
+            // چک می‌کنیم آیا این دکمه در حال حاضر باید جابجا باشد؟ اگر نه، برش گردان
+            // (برای جلوگیری از تکرار انیمیشن، اگر سر جایش است کاری نمی‌کنیم)
+            // اما بهتر است همیشه دستور حرکت به مکان اصلی را بدهیم (DOTween خودش هندل می‌کند)
+            target.DOKill(); // قطع انیمیشن قبلی
+            target.DOAnchorPos(originalPos, 0.4f).SetEase(Ease.OutQuad);
+        }
+
+        // ب) حالا بررسی می‌کنیم کدام دکمه‌ها برای پنلِ "فعلی" باید تغییر مکان دهند
+        foreach (var config in uiShifters)
+        {
+            if (config.triggerPanel == activePanelType && config.targetElement != null)
+            {
+                // موقعیت اصلی را می‌گیریم
+                Vector2 originalPos = initialPositions[config.targetElement];
+                
+                // موقعیت جدید با اعمال آفست
+                Vector2 targetPos = new Vector2(originalPos.x + config.shiftOffsetX, originalPos.y);
+
+                // انیمیشن به سمت موقعیت جدید (Override کردن حرکت Reset بالا)
+                config.targetElement.DOKill();
+                config.targetElement.DOAnchorPos(targetPos, config.animationDuration).SetEase(Ease.OutBack);
             }
         }
     }
@@ -115,7 +172,6 @@ public class MainMenuManager : MonoBehaviour
         }
     }
 
-    // --- Action Handling ---
     public void OnStartGameClicked()
     {
         if (GamePersistenceManager.Instance.TryConsumeHeart())
@@ -132,7 +188,6 @@ public class MainMenuManager : MonoBehaviour
     {
         if(GamePersistenceManager.Instance.SpendCoins(500))
         {
-            // GamePersistenceManager.Instance.RestoreHearts(); // متد فرضی
             GoBack();
         }
     }
@@ -141,7 +196,6 @@ public class MainMenuManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            // اگر در منوی اصلی نیستیم، دکمه Back کار کنه
             if (currentPanel != null && currentPanel.panelType != MenuPanelType.MainMenu)
             {
                 GoBack();

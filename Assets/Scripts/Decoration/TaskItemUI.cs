@@ -72,7 +72,8 @@ public class TaskItemUI : MonoBehaviour
             // 3. ساختن دکور
             MainMenuManager.Instance.GoBack();
             RoomScrollController.Instance.FocusOnTarget(spot.transform);
-
+            MainMenuManager.Instance.OpenPanel(MenuPanelType.SelectDecor);
+            DecorationSelectionPanel.Instance.OpenSelection(spot);
         }
     }
 

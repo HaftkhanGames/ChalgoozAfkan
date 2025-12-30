@@ -1,20 +1,22 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using DG.Tweening;
 
-public class DecorationSelectionPanel : MenuPanel 
+// تغییر مهم: ارث‌بری از MenuPanel حذف شد و تبدیل به MonoBehaviour شد
+public class DecorationSelectionPanel : MonoBehaviour 
 {
     public static DecorationSelectionPanel Instance;
 
     [Header("Components")]
-    public Transform container;          // آبجکت Content داخل ScrollView
-    public VariantItemUI itemPrefab;     // پریفب ساخته شده در مرحله ۱
+    public Transform container;          
+    public VariantItemUI itemPrefab;     
     public Button confirmButton;
+    public RectTransform panelContent; // پنل اصلی برای انیمیشن حرکت
+    public CanvasGroup canvasGroup;    // برای انیمیشن فید
 
     private DecorationSpotController currentSpot;
     private int selectedVariantIndex = 0;
-    
-    // لیستی برای نگه داشتن دکمه‌های ساخته شده (برای مدیریت هایلایت)
     private List<VariantItemUI> spawnedItems = new List<VariantItemUI>();
 
     private void Awake()
@@ -23,75 +25,94 @@ public class DecorationSelectionPanel : MenuPanel
         
         if (confirmButton)
             confirmButton.onClick.AddListener(OnConfirmClicked);
+
+        if(canvasGroup == null) canvasGroup = GetComponent<CanvasGroup>();
+        
+        // اطمینان از خاموش بودن در شروع بازی
+        gameObject.SetActive(false);
     }
 
-    // --- تابع اصلی: فراخوانی توسط TaskItemUI یا سیستم ---
     public void OpenSelection(DecorationSpotController spot)
     {
         currentSpot = spot;
-        selectedVariantIndex = 0; // پیش‌فرض اولین آیتم انتخاب است
+        selectedVariantIndex = 0; 
 
-        // 1. پاک کردن آیتم‌های قبلی لیست
-        foreach (Transform child in container)
-        {
-            Destroy(child.gameObject);
-        }
+        // 1. پاکسازی آیتم‌های قبلی
+        foreach (Transform child in container) Destroy(child.gameObject);
         spawnedItems.Clear();
 
-        // 2. خواندن لیست Variants از SO شما
+        // 2. خواندن لیست Variants از دیتای اسپات
         var variantList = spot.itemData.variants; 
+        if (variantList == null || variantList.Count == 0) return;
 
-        if (variantList == null || variantList.Count == 0)
-        {
-            Debug.LogError("No variants data found in SO!");
-            return;
-        }
-
-        // 3. حلقه برای ساخت دکمه‌ها
+        // 3. ساخت دکمه‌ها
         for (int i = 0; i < variantList.Count; i++)
         {
-            // ساخت آبجکت
             VariantItemUI newItem = Instantiate(itemPrefab, container);
-            
-            // دریافت آیکون از کلاس DecorationVariantData شما
             Sprite icon = variantList[i].thumbnail; 
             
-            // مقداردهی اولیه (اگر i برابر 0 باشد یعنی انتخاب شده است)
-            newItem.Initialize(i, icon, i == 0, OnItemSelected);
-            
+            newItem.Initialize(i, icon, false, OnItemSelected);
             spawnedItems.Add(newItem);
         }
 
-        // 4. نمایش پنل و پیش‌نمایش مدل اول
-        base.Open();
-        currentSpot.PreviewModel(0);
+        // 4. نمایش پنل با انیمیشن
+        AnimateEntry();
+
+        // 5. انتخاب خودکار اولین مدل
+        OnItemSelected(0);
     }
 
-    // وقتی روی یکی از آیتم‌ها کلیک شد
+    private void AnimateEntry()
+    {
+        gameObject.SetActive(true);
+
+        // تنظیمات اولیه قبل از انیمیشن
+        if (canvasGroup) canvasGroup.alpha = 0f;
+        if (panelContent) panelContent.anchoredPosition = new Vector2(0, -150f); // کمی پایین‌تر
+
+        // اجرای انیمیشن‌ها
+        if (canvasGroup) canvasGroup.DOFade(1f, 0.4f);
+        if (panelContent) panelContent.DOAnchorPos(Vector2.zero, 0.5f).SetEase(Ease.OutBack);
+    }
+
     private void OnItemSelected(int index)
     {
         selectedVariantIndex = index;
 
-        // آپدیت گرافیک دکمه‌ها (فقط دکمه جدید هایلایت شود)
+        // به‌روزرسانی گرافیک دکمه‌ها (کدام انتخاب شده)
         for (int i = 0; i < spawnedItems.Count; i++)
         {
             spawnedItems[i].SetSelectionState(i == selectedVariantIndex);
         }
 
-        // تغییر مدل سه بعدی در صحنه
+        // نمایش پیش‌نمایش مدل در صحنه
         if (currentSpot != null)
         {
             currentSpot.PreviewModel(selectedVariantIndex);
         }
     }
 
-    // نهایی سازی
     private void OnConfirmClicked()
     {
+        // نهایی کردن خرید/ساخت
         if (currentSpot != null)
         {
-            // currentSpot.ConfirmAndFinish(selectedVariantIndex);
+            currentSpot.ConfirmAndFinish(selectedVariantIndex);
         }
-        Close();
+        MainMenuManager.Instance.GoBack();
+        // ClosePanel();
+    }
+
+    // متد بستن مستقل
+    public void ClosePanel()
+    {
+        if (canvasGroup)
+        {
+            canvasGroup.DOFade(0f, 0.3f).OnComplete(() => gameObject.SetActive(false));
+        }
+        else
+        {
+            gameObject.SetActive(false);
+        }
     }
 }
