@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2474663720f8f2e4dac06d737b698a84, type: 3}
+  m_Name: Sticker
+  m_EditorClassIdentifier: Assembly-CSharp::DecorationItemSO
+  id: Sticker
+  decorationName: "\u0628\u0631\u0686\u0633\u0628"
+  itemName: "\u0628\u0631\u0686\u0633\u0628"
+  icon: {fileID: 6278496768788630107, guid: d68486cfbceab034596fd3fadeb0ee9e, type: 3}
+  star: 0
+  variants:
+  - thumbnail: {fileID: 4779973931113887800, guid: d7c65d71e39dfe846a204ef43a17bab5, type: 3}
+    price:
+      currencyType: 0
+      amount: 0
+  - thumbnail: {fileID: 3561804308820838893, guid: fa610b4d26ee2e44dbd9367c97c64a4a, type: 3}
+    price:
+      currencyType: 0
+      amount: 0
+  - thumbnail: {fileID: -7881902501240560668, guid: 02cdd12eb48daa543975c404f9e9d519, type: 3}
+    price:
+      currencyType: 0
+      amount: 0
+  - thumbnail: {fileID: 6278496768788630107, guid: d68486cfbceab034596fd3fadeb0ee9e, type: 3}
+    price:
+      currencyType: 0
+      amount: 0
+  - thumbnail: {fileID: -5564255503473467109, guid: 0f6c8784bc27c024c872ab13635ed472, type: 3}
+    price:
+      currencyType: 0
+      amount: 0

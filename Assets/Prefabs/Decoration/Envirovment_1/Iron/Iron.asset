@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2474663720f8f2e4dac06d737b698a84, type: 3}
+  m_Name: Iron
+  m_EditorClassIdentifier: Assembly-CSharp::DecorationItemSO
+  id: Iron
+  decorationName: "\u0627\u062A\u0648"
+  itemName: "\u0627\u062A\u0648"
+  icon: {fileID: -4804494063885127440, guid: f78a238d0f6d8e54eb67825ebd5b99b2, type: 3}
+  star: 0
+  variants:
+  - thumbnail: {fileID: 9029401286849047260, guid: 370a9b940dd4d9042b4c75cf4d039ff9, type: 3}
+    price:
+      currencyType: 0
+      amount: 0
+  - thumbnail: {fileID: -4804494063885127440, guid: f78a238d0f6d8e54eb67825ebd5b99b2, type: 3}
+    price:
+      currencyType: 0
+      amount: 0
+  - thumbnail: {fileID: -5853481198087044335, guid: 662e6ffb506e1de42b446b21eb15c6ea, type: 3}
+    price:
+      currencyType: 0
+      amount: 0

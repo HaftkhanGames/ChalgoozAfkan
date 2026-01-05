@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2474663720f8f2e4dac06d737b698a84, type: 3}
+  m_Name: Door
+  m_EditorClassIdentifier: Assembly-CSharp::DecorationItemSO
+  id: Door
+  decorationName: "\u062F\u0631"
+  itemName: "\u062F\u0631"
+  icon: {fileID: 5522735044404357129, guid: c0efa467836a92b459ca919c7d19f951, type: 3}
+  star: 0
+  variants:
+  - thumbnail: {fileID: 5522735044404357129, guid: c0efa467836a92b459ca919c7d19f951, type: 3}
+    price:
+      currencyType: 0
+      amount: 0
+  - thumbnail: {fileID: -4003764732546075100, guid: 9f050adf915b203429d2967a5c5aa5b2, type: 3}
+    price:
+      currencyType: 0
+      amount: 0
+  - thumbnail: {fileID: 8897706178151362576, guid: 709798778442b6943b42d471817c59f3, type: 3}
+    price:
+      currencyType: 0
+      amount: 0

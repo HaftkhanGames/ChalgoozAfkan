@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2474663720f8f2e4dac06d737b698a84, type: 3}
+  m_Name: AirConditioning
+  m_EditorClassIdentifier: Assembly-CSharp::DecorationItemSO
+  id: AirConditioning
+  decorationName: "\u062A\u0647\u0648\u06CC\u0647 \u0647\u0648\u0627"
+  itemName: "\u062A\u0647\u0648\u06CC\u0647"
+  icon: {fileID: -2503055392024290555, guid: 88b69dd31db84c0488bbaa210688dee6, type: 3}
+  star: 2
+  variants:
+  - thumbnail: {fileID: -5980232045188715119, guid: 730fb5d5871d7d742bee5f4c9122ae80, type: 3}
+    price:
+      currencyType: 0
+      amount: 0
+  - thumbnail: {fileID: -2503055392024290555, guid: 88b69dd31db84c0488bbaa210688dee6, type: 3}
+    price:
+      currencyType: 0
+      amount: 0
+  - thumbnail: {fileID: 3012703519172251634, guid: 7a9108484519ed145800b2872a0697fc, type: 3}
+    price:
+      currencyType: 0
+      amount: 0

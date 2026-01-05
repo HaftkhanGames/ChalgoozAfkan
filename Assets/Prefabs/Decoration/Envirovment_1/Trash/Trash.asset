@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2474663720f8f2e4dac06d737b698a84, type: 3}
+  m_Name: Trash
+  m_EditorClassIdentifier: Assembly-CSharp::DecorationItemSO
+  id: Trash
+  decorationName: "\u0633\u0637\u0644 \u0632\u0628\u0627\u0644\u0647"
+  itemName: "\u0633\u0637\u0644 \u0632\u0628\u0627\u0644\u0647"
+  icon: {fileID: -8836407676144995008, guid: 8f6de1e2955632c4188bba937f48d5c5, type: 3}
+  star: 3
+  variants:
+  - thumbnail: {fileID: -930334261700384751, guid: 3ce75540c57d48b46ae95aa103746151, type: 3}
+    price:
+      currencyType: 0
+      amount: 0
+  - thumbnail: {fileID: -2063483289247264519, guid: 76b89b0b25abfac4d9ebb1cfb7b6794f, type: 3}
+    price:
+      currencyType: 0
+      amount: 0
+  - thumbnail: {fileID: -1306562147625271264, guid: 03ec02fd9ed168e4da571a93d382e690, type: 3}
+    price:
+      currencyType: 0
+      amount: 0
+  - thumbnail: {fileID: -8836407676144995008, guid: 8f6de1e2955632c4188bba937f48d5c5, type: 3}
+    price:
+      currencyType: 0
+      amount: 0
