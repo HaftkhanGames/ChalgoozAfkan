@@ -20,12 +20,12 @@ MonoBehaviour:
   variants:
   - thumbnail: {fileID: 6937817954938267909, guid: 45ebca3de6d73be48ab17bc8aa1f6165, type: 3}
     price:
-      currencyType: 0
-      amount: 0
+      currencyType: 1
+      amount: 50
   - thumbnail: {fileID: -6470460504253458178, guid: 17a5172cf6fe5f445aa26dd63db24344, type: 3}
     price:
-      currencyType: 0
-      amount: 0
+      currencyType: 2
+      amount: 10
   - thumbnail: {fileID: -4178046375966092550, guid: c46050f989107414ab55ab5b97e80310, type: 3}
     price:
       currencyType: 0

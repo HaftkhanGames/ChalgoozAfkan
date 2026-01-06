@@ -34,7 +34,7 @@ public class GamePersistenceManager : MonoBehaviour
     {
         savePath = Application.persistentDataPath + "/playerdata.dat";
         LoadGame();
-        GamePersistenceManager.Instance.AddCurrency(0, 0, 100, "Debug", "TestAdd");
+        GamePersistenceManager.Instance.AddCurrency(100, 100, 100, "Debug", "TestAdd");
 
         // بلافاصله بعد از لود، قلب‌ها را چک کن
         CalculateOfflineHearts();
@@ -245,6 +245,7 @@ public class GamePersistenceManager : MonoBehaviour
     /// </summary>
     public bool SpendStars(int amount, string itemType = "Unknown", string itemId = "Unknown")
     {
+        print(amount);
         if(data.stars >= amount)
         {
             data.stars -= amount;

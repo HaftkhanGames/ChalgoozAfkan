@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using DG.Tweening;
+using RTLTMPro;
 
 // تغییر مهم: ارث‌بری از MenuPanel حذف شد و تبدیل به MonoBehaviour شد
 public class DecorationSelectionPanel : MonoBehaviour 
@@ -19,6 +20,10 @@ public class DecorationSelectionPanel : MonoBehaviour
     private int selectedVariantIndex = 0;
     private List<VariantItemUI> spawnedItems = new List<VariantItemUI>();
 
+    public RTLTextMeshPro priceText;
+    public Image iconImageCoin;
+    public Image iconImageGem;
+    public DecorationSpotController data;
     private void Awake()
     {
         if (Instance == null) Instance = this;
@@ -35,8 +40,8 @@ public class DecorationSelectionPanel : MonoBehaviour
     public void OpenSelection(DecorationSpotController spot)
     {
         currentSpot = spot;
-        selectedVariantIndex = 0; 
-
+        selectedVariantIndex = 0;
+        data = spot;
         // 1. پاکسازی آیتم‌های قبلی
         foreach (Transform child in container) Destroy(child.gameObject);
         spawnedItems.Clear();
@@ -83,6 +88,53 @@ public class DecorationSelectionPanel : MonoBehaviour
         for (int i = 0; i < spawnedItems.Count; i++)
         {
             spawnedItems[i].SetSelectionState(i == selectedVariantIndex);
+        }
+
+        print(GamePersistenceManager.Instance.data.coins);
+        int amount = data.itemData.variants[selectedVariantIndex].price.amount;
+        priceText.text = amount.ToString();
+        
+        switch (data.itemData.variants[selectedVariantIndex].price.currencyType)
+        {
+            case CurrencyType.Coin:
+                iconImageCoin.DOFade(1f, 0.4f);
+                iconImageGem.DOFade(0f, 0.4f);
+                
+                if (amount > GamePersistenceManager.Instance.data.coins)
+                {
+                    priceText.color = Color.red;
+                    confirmButton.interactable = false;
+                }
+                else
+                {
+                    priceText.color = Color.black;
+                    confirmButton.interactable = true;
+                }
+                
+                break;
+            case CurrencyType.Gem:
+                iconImageCoin.DOFade(0f, 0.4f);
+                iconImageGem.DOFade(1f, 0.4f);
+                
+                if (amount > GamePersistenceManager.Instance.data.gems)
+                {
+                    priceText.color = Color.red;
+                    confirmButton.interactable = false;
+                }
+                else
+                {
+                    priceText.color = Color.black;
+                    confirmButton.interactable = true;
+                }
+                
+                break;
+            case CurrencyType.Free:
+                iconImageCoin.DOFade(0f, 0.4f);
+                iconImageGem.DOFade(0f, 0.4f);
+                priceText.color = Color.black;
+                confirmButton.interactable = true;
+                priceText.text = "Free";
+                break;
         }
 
         // نمایش پیش‌نمایش مدل در صحنه

@@ -57,24 +57,13 @@ public class TaskItemUI : MonoBehaviour
         if (currentStars < cost)
         {
             Debug.Log("Not enough stars! (ستاره کافی نیست)");
-            return; 
+            return;
         }
-
-        // 2. خرج کردن
-        bool spent = GamePersistenceManager.Instance.SpendStars(
-            cost, 
-            "TaskBuild",   
-            spot.itemData.id 
-        );
-
-        if (spent)
-        {
-            // 3. ساختن دکور
-            MainMenuManager.Instance.GoBack();
-            RoomScrollController.Instance.FocusOnTarget(spot.transform);
-            MainMenuManager.Instance.OpenPanel(MenuPanelType.SelectDecor);
-            DecorationSelectionPanel.Instance.OpenSelection(spot);
-        }
+        
+        MainMenuManager.Instance.GoBack();
+        RoomScrollController.Instance.FocusOnTarget(spot.transform);
+        MainMenuManager.Instance.OpenPanel(MenuPanelType.SelectDecor);
+        DecorationSelectionPanel.Instance.OpenSelection(spot);
     }
 
     /// <summary>
