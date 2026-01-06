@@ -1,10 +1,13 @@
 fileFormatVersion: 2
-guid: c5e7ef64f1887a94aaa44f4dbf06e193
+guid: bc9aa9e34fe667c4887cf220ef67f206
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -6256890981612926859
-    second: floor-1 background_0
+      213: -1700454209578407292
+    second: 18- 01 pele_0
+  - first:
+      213: -4170075195503397386
+    second: 18- 01 pele_1
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -72,7 +75,7 @@ TextureImporter:
   platformSettings:
   - serializedVersion: 4
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 8192
+    maxTextureSize: 4096
     resizeAlgorithm: 0
     textureFormat: -1
     textureCompression: 1
@@ -113,13 +116,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: floor-1 background_0
+      name: 18- 01 pele_0
       rect:
         serializedVersion: 2
         x: 0
-        y: 0
-        width: 5760
-        height: 1080
+        y: 21
+        width: 529
+        height: 730
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +131,30 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 578cd9a7dce0b29a0800000000000000
-      internalID: -6256890981612926859
+      spriteID: 48ae241e7e5c668e0800000000000000
+      internalID: -1700454209578407292
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 18- 01 pele_1
+      rect:
+        serializedVersion: 2
+        x: 231
+        y: 0
+        width: 64
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6f53a5524bae026c0800000000000000
+      internalID: -4170075195503397386
       vertices: []
       indices: 
       edges: []
@@ -148,7 +173,8 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      floor-1 background_0: -6256890981612926859
+      18- 01 pele_0: -1700454209578407292
+      18- 01 pele_1: -4170075195503397386
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2474663720f8f2e4dac06d737b698a84, type: 3}
+  m_Name: Bathroom
+  m_EditorClassIdentifier: Assembly-CSharp::DecorationItemSO
+  id: Bathroom
+  decorationName: "\u062D\u0645\u0627\u0645"
+  itemName: "\u062D\u0645\u0627\u0645"
+  icon: {fileID: 21300000, guid: f0755843f21377c40927b792833cb924, type: 3}
+  star: 5
+  variants:
+  - thumbnail: {fileID: 21300000, guid: edd5e26bc45955742975a4c294d2973d, type: 3}
+    price:
+      currencyType: 0
+      amount: 0
+  - thumbnail: {fileID: 21300000, guid: f485f2d1d7b894b41b416b977e2ad582, type: 3}
+    price:
+      currencyType: 0
+      amount: 0
+  - thumbnail: {fileID: 21300000, guid: bcb8361de5511c64e9397e1f3228ee5d, type: 3}
+    price:
+      currencyType: 0
+      amount: 0
+  - thumbnail: {fileID: 21300000, guid: f0755843f21377c40927b792833cb924, type: 3}
+    price:
+      currencyType: 0
+      amount: 0

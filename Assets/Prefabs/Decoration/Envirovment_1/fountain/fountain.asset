@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2474663720f8f2e4dac06d737b698a84, type: 3}
+  m_Name: fountain
+  m_EditorClassIdentifier: Assembly-CSharp::DecorationItemSO
+  id: fountain
+  decorationName: "\u0622\u0628 \u0646\u0645\u0627"
+  itemName: "\u0622\u0628 \u0646\u0645\u0627"
+  icon: {fileID: 21300000, guid: 2f89f467390e92647b9765f1e55cd6bc, type: 3}
+  star: 3
+  variants:
+  - thumbnail: {fileID: 21300000, guid: 2f89f467390e92647b9765f1e55cd6bc, type: 3}
+    price:
+      currencyType: 0
+      amount: 0
+  - thumbnail: {fileID: 21300000, guid: 54f1063d6e70da94f834589205e3417c, type: 3}
+    price:
+      currencyType: 0
+      amount: 0
+  - thumbnail: {fileID: 21300000, guid: d03435fd2b481eb4796c837a0f45ece9, type: 3}
+    price:
+      currencyType: 0
+      amount: 0
+  - thumbnail: {fileID: 21300000, guid: f47530ae42ea9e840b7be679e31cac4b, type: 3}
+    price:
+      currencyType: 0
+      amount: 0

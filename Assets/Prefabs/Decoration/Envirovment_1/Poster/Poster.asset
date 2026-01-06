@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2474663720f8f2e4dac06d737b698a84, type: 3}
+  m_Name: Poster
+  m_EditorClassIdentifier: Assembly-CSharp::DecorationItemSO
+  id: Poster
+  decorationName: "\u067E\u0648\u0633\u062A\u0631"
+  itemName: "\u067E\u0648\u0633\u062A\u0631"
+  icon: {fileID: 21300000, guid: c86f76277821e9e489a05aa3ff072dd2, type: 3}
+  star: 5
+  variants:
+  - thumbnail: {fileID: 21300000, guid: c86f76277821e9e489a05aa3ff072dd2, type: 3}
+    price:
+      currencyType: 0
+      amount: 0
+  - thumbnail: {fileID: 21300000, guid: 2e0f8cb87fa528743965b1bb80fbeb95, type: 3}
+    price:
+      currencyType: 0
+      amount: 0
+  - thumbnail: {fileID: 21300000, guid: 03ebcad0a19a3b74492c560d429524c1, type: 3}
+    price:
+      currencyType: 0
+      amount: 0
+  - thumbnail: {fileID: 21300000, guid: fd18ea0b99710d54cb76ab8f6d849858, type: 3}
+    price:
+      currencyType: 0
+      amount: 0

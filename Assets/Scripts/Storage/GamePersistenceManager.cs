@@ -17,6 +17,7 @@ public class GamePersistenceManager : MonoBehaviour
 
     private void Awake()
     {
+        Application.targetFrameRate = 60;
         if (Instance == null)
         {
             Instance = this;
@@ -266,4 +267,37 @@ public class GamePersistenceManager : MonoBehaviour
     {
         SaveGame();
     }
+    
+    // --- Reset Logic ---
+    
+    public void ResetAllData()
+    {
+        // 1. حذف فایل فیزیکی از حافظه دستگاه
+        if (File.Exists(savePath))
+        {
+            File.Delete(savePath);
+            Debug.Log("Save file deleted successfully.");
+        }
+
+        // 2. ریست کردن دیتاهای درون حافظه (RAM)
+        data = new PlayerData();
+        
+        // تنظیم مقادیر اولیه (مثلاً قلب پر)
+        data.currentHearts = maxHearts;
+        data.lastHeartRegenTime = DateTime.Now.Ticks;
+
+        // اطمینان از اینکه دیکشنری دکوراسیون نال نباشد
+        if (data.decorations == null)
+            data.decorations = new Dictionary<string, DecorationSaveData>();
+
+        // 3. ذخیره دیتای خالی جدید (برای اطمینان)
+        SaveGame();
+
+        // 4. لود مجدد صحنه برای به‌روزرسانی UI (اختیاری ولی پیشنهادی)
+        // نیاز به using UnityEngine.SceneManagement; در بالای فایل دارید
+        UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex);
+
+        Debug.Log("Game Data Reset Complete!");
+    }
+
 }
